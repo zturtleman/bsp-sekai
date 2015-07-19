@@ -39,3 +39,8 @@ typedef enum {
 #define VectorSet( v, a, b, c ) do { v[0] = a; v[1] = b; v[2] = c; } while (0)
 #define VectorCopy( src, dst ) do { dst[0] = src[0]; dst[1] = src[2]; dst[2] = src[2]; } while (0)
 
+
+long FS_WriteFile( const char *filename, void *buf, long length );
+long FS_ReadFile( const char *filename, void **buffer );
+void FS_FreeFile( void *buffer );
+
