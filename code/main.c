@@ -2,12 +2,17 @@
 #include "sekai.h"
 #include "bsp.h"
 
+// convert_nsco.c
+void ConvertNscoToNscoET( bspFile_t *bsp );
+void ConvertNscoETToNsco( bspFile_t *bsp );
+
 int main( int argc, char **argv ) {
 	bspFile_t *bsp;
 	int saveLength;
 	void *saveData;
 	char *conversion, *inputFile, *formatName, *outputFile;
 	bspFormat_t *outFormat;
+	void (*convertFunc)( bspFile_t *bsp );
 
 	if ( argc < 5 ) {
 		Com_Printf( "bspsekai <conversion> <input-BSP> <format> <output-BSP>\n" );
@@ -17,7 +22,9 @@ int main( int argc, char **argv ) {
 		Com_Printf( "\n" );
 		Com_Printf( "<conversion> specifies how surface and content flags are remapped.\n" );
 		Com_Printf( "Conversion list:\n" );
-		Com_Printf( "  none      - Don't remap surface flags.\n" );
+		Com_Printf( "  none      - No conversion.\n" );
+		Com_Printf( "  nsco2et   - Convert Navy SEALS: Covert Operation surface/content flags to ET values.\n" );
+		Com_Printf( "  et2nsco   - Convert ET surface/content flags to Navy SEALS: Covert Operation values.\n" );
 		Com_Printf( "\n" );
 		Com_Printf( "The format of <input-BSP> is automatically determined from the file.\n" );
 		Com_Printf( "Input BSP formats: (not all are fully supported)\n" );
@@ -45,7 +52,11 @@ int main( int argc, char **argv ) {
 	outputFile = argv[4];
 
 	if ( Q_stricmp( conversion, "none" ) == 0 ) {
-
+		convertFunc = NULL;
+	} else if ( Q_stricmp( conversion, "nsco2et" ) == 0 ) {
+		convertFunc = ConvertNscoToNscoET;
+	} else if ( Q_stricmp( conversion, "et2nsco" ) == 0 ) {
+		convertFunc = ConvertNscoETToNsco;
 	} else {
 		Com_Printf( "Error: Unknown conversion '%s'.\n", conversion );
 		return 1;
@@ -98,6 +109,10 @@ int main( int argc, char **argv ) {
 	Com_Printf( "Loaded BSP '%s' successfully.\n", inputFile );
 
 	if ( outFormat->saveFunction ) {
+		if ( convertFunc ) {
+			convertFunc( bsp );
+		}
+
 		saveData = NULL;
 		saveLength = outFormat->saveFunction( outFormat, outputFile, bsp, &saveData );
 

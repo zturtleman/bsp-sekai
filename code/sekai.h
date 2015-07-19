@@ -40,6 +40,7 @@ typedef enum {
 #define VectorCopy( src, dst ) do { dst[0] = src[0]; dst[1] = src[2]; dst[2] = src[2]; } while (0)
 
 
+// main.c
 long FS_WriteFile( const char *filename, void *buf, long length );
 long FS_ReadFile( const char *filename, void **buffer );
 void FS_FreeFile( void *buffer );

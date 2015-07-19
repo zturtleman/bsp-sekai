@@ -15,6 +15,7 @@ set( BSP_SRCS
 	code/bsp_q3.c
 	code/bsp_q3test106.c
 	code/bsp_sof2.c
+	code/convert_nsco.c
 	code/main.c
 	code/md4.c
 )
