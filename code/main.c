@@ -44,9 +44,12 @@ long FS_ReadFile( const char *filename, void **buffer ) {
 	buf = malloc( length );
 
 	if ( fread( buf, length, 1, f ) != 1 ) {
+		fclose( f );
 		free( buf );
 		return 0;
 	}
+
+	fclose( f );
 
 	*buffer = buf;
 	return length;
