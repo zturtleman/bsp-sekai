@@ -21,7 +21,7 @@ typedef enum {
 #define Com_Memcpy memcpy
 #define Com_Printf printf
 
-#define Com_Error( err, ... ) do { Com_Printf( __VA_ARGS__ ); exit( 1 ); } while (0)
+#define Com_Error( err, ... ) do { Com_Printf( __VA_ARGS__ ); Com_Printf( "\n" ); exit( 1 ); } while (0)
 #define Q_strncpyz( dst, src, size ) do { strncpy( dst, src, size-1 ); dst[size-1] = 0; } while (0)
 #define ARRAY_LEN( x ) ( sizeof ( x ) / sizeof ( x[0] ) )
 

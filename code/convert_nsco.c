@@ -56,6 +56,7 @@ struct {
 
 int numNscoSurfaceFlags = ARRAY_LEN( nscoSurfaceFlags );
 
+// ZTM: TODO: strip out flares if they exist?
 void ConvertNscoToNscoET( bspFile_t *bsp ) {
 	int i, j;
 
