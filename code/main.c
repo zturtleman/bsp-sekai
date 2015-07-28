@@ -30,7 +30,7 @@ int main( int argc, char **argv ) {
 		Com_Printf( "Input BSP formats: (not all are fully supported)\n" );
 		Com_Printf( "  Quake 3, RTCW, ET, EF, EF2, FAKK, Alice, Dark Salvation, MOHAA, Q3Test 1.06 or later, SoF2, JK2, JA\n" );
 		Com_Printf( "\n" );
-		Com_Printf( "<format> is used to determine BSP format.\n" );
+		Com_Printf( "<format> is used to determine output BSP format.\n" );
 		Com_Printf( "BSP format list:\n" );
 		Com_Printf( "  quake3    - Quake 3.\n" );
 		//Com_Printf( "  q3test106 - Q3Test 1.06/1.07/1.08. Later Q3Test use 'quake3' format.\n" );
