@@ -59,7 +59,7 @@ typedef enum {
 #define Q_stricmp strcasecmp
 #endif
 
-// FIXME: assumes host is little endiness
+// FIXME: assumes host is little endian
 #define LittleShort(x) (x)
 #define LittleLong(x) (x)
 #define LittleFloat(x) (x)
