@@ -1,5 +1,5 @@
 # BSP sekai
-BSP sekai (BSP world) is a level converter for Quake 3's BSP format and games based on it. It is based on the BSP loaders in Spearmint.
+BSP sekai (BSP world) is a level converter for Quake 3's BSP format and games based on it. It is based on the BSP loaders in the [Spearmint engine](http://spearmint.pw).
 
 This is alpha software, there are many issues of things not properly change or removed when converting to other BSP formats.
 The only supported conversion is NSCO maps (Q3 with modified surface/content bits) to Enemy Territory BSP format.
@@ -32,7 +32,6 @@ BSP format list:
   ef        - Elite Force.
 ```
 
-
 ## BSP Formats
 Quake 3 BSP format is also used by Elite Force, Tremulous, Smokin' Guns, World of Padman, Turtle Arena, and other games.
 Soldier of Fortune 2 BSP format is also used by Jedi Knight 2: Jedi Outcast and Jedi Knight: Jedi Academy.
@@ -49,7 +48,7 @@ Dark Salvation               | IBSP 666
 
 ### Read formats
 Game | BSP ident & version | notes
----- | ----
+---- | ---- | ----
 Q3Test 1.06/1.07/1.08        | IBSP 45
 Quake III Arena              | IBSP 46
 Return to Castle Wolfenstein | IBSP 47  | different version than Q3
@@ -61,8 +60,6 @@ American McGee's Alice       | FAKK 42  | different version than FAKK
 Elite Force 2                | EF2! 20  | major differences from FAKK, not fully supported
 Medal of Honor Allied Assult | 2015 19  | major differences from FAKK, not fully supported
 
-## Misc
-
-
-However, there are game specific data (shader content bits and surface bits) saved in the 
+## License
+BSP sekai is licensed under a [modified version of the GNU GPLv3](https://github.com/zturtleman/bsp-sekai/blob/master/COPYING.txt#L625) (or at your option, any later version). The license is also used by Spearmint, Return to Castle Wolfenstein, Wolfenstein: Enemy Territory, and Doom 3.
 
