@@ -66,10 +66,10 @@ BSP sekai uses CMake for generating the build system.
 
 For example on GNU/Linux with git and cmake installed:
 
-  git clone https://github.com/zturtleman/bsp-sekai.git
-  cd bsp-sekai
-  mkdir build
-  cd build
-  cmake -G "Unix Makefiles" ..
-  make
+    git clone https://github.com/zturtleman/bsp-sekai.git
+    cd bsp-sekai
+    mkdir build
+    cd build
+    cmake -G "Unix Makefiles" ..
+    make
 
