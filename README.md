@@ -54,8 +54,8 @@ Dark Salvation               | IBSP 666 | different version than Q3
 Soldier of Fortune 2         | RBSP 1   | missing light styles support
 Heavy Metal: F.A.K.K.2       | FAKK 12  | major differences from Q3, not fully supported
 American McGee's Alice       | FAKK 42  | different version than FAKK, not fully supported
-Elite Force 2                | EF2! 20  | major differences from FAKK, not fully supported
 Medal of Honor Allied Assult | 2015 19  | major differences from FAKK, not fully supported
+Elite Force 2                | EF2! 20  | major differences from FAKK, not fully supported
 
 ## License
 BSP sekai is licensed under a [modified version of the GNU GPLv3](https://github.com/zturtleman/bsp-sekai/blob/master/COPYING.txt#L625) (or at your option, any later version). The license is also used by Spearmint, Return to Castle Wolfenstein, Wolfenstein: Enemy Territory, and Doom 3.
