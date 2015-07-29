@@ -21,13 +21,12 @@ The format of <input-BSP> is automatically determined from the file.
 Input BSP formats: (not all are fully supported)
   Quake 3, RTCW, ET, EF, EF2, FAKK, Alice, Dark Salvation, MOHAA, Q3Test 1.06 or later, SoF2, JK2, JA
 
-<format> is used to determine BSP format.
+<format> is used to determine output BSP format.
 BSP format list:
   quake3    - Quake 3.
   rtcw      - Return to Castle Wolfenstein.
   et        - Wolfenstein: Enemy Territory.
   darks     - Dark Salvation.
-  ef        - Elite Force.
 ```
 
 ## BSP Formats
