@@ -54,7 +54,7 @@ Wolfenstein: Enemy Territory | IBSP 47  | adds foliage surface type
 Dark Salvation               | IBSP 666 | different version than Q3
 Soldier of Fortune 2         | RBSP 1   | missing light styles support
 Heavy Metal: F.A.K.K.2       | FAKK 12  | major differences from Q3, not fully supported
-American McGee's Alice       | FAKK 42  | different version than FAKK
+American McGee's Alice       | FAKK 42  | different version than FAKK, not fully supported
 Elite Force 2                | EF2! 20  | major differences from FAKK, not fully supported
 Medal of Honor Allied Assult | 2015 19  | major differences from FAKK, not fully supported
 
