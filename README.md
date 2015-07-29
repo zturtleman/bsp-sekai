@@ -50,6 +50,7 @@ Q3Test 1.06/1.07/1.08        | IBSP 45
 Quake III Arena              | IBSP 46
 Return to Castle Wolfenstein | IBSP 47  | different version than Q3
 Wolfenstein: Enemy Territory | IBSP 47  | adds foliage surface type
+QuakeLive                    | IBSP 47  | advertisements lump is ignored
 Dark Salvation               | IBSP 666 | different version than Q3
 Soldier of Fortune 2         | RBSP 1   | missing light styles support
 Heavy Metal: F.A.K.K.2       | FAKK 12  | major differences from Q3, not fully supported
