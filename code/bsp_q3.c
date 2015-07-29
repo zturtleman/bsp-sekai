@@ -513,13 +513,13 @@ bspFile_t *BSP_LoadQ3( const bspFormat_t *format, const char *name, const void *
 
 // convert internal BSP format to BSP for saving to disk
 // ZTM: TODO: convert ET foliage surfaces if Q3 format? how to check if Q3 or RTCW and not ET?
-// ZTM: TODO: convert SOF2 light array
 // ZTM: TODO: handle different default light grid sizes?
 int BSP_SaveQ3( const bspFormat_t *format, const char *name, const bspFile_t *bsp, void **dataOut ) {
 	int				i, j, k;
 	dheader_t		header;
 	byte			*data;
 	int				dataLength;
+	int				numGridPoints;
 
 	*dataOut = NULL;
 
@@ -530,6 +530,12 @@ int BSP_SaveQ3( const bspFormat_t *format, const char *name, const bspFile_t *bs
 	bsp->defaultLightGridSize[1] = LIGHTING_GRIDSIZE_Y;
 	bsp->defaultLightGridSize[2] = LIGHTING_GRIDSIZE_Z;
 #endif
+
+	if ( bsp->numGridArrayPoints ) {
+		numGridPoints = bsp->numGridArrayPoints;
+	} else {
+		numGridPoints = bsp->numGridPoints;
+	}
 
 	//
 	// setup header
@@ -555,7 +561,7 @@ int BSP_SaveQ3( const bspFormat_t *format, const char *name, const bspFile_t *bs
 	AddLump( &header, &dataLength, LUMP_FOGS, bsp->numFogs, sizeof ( realDfog_t ) );
 	AddLump( &header, &dataLength, LUMP_SURFACES, bsp->numSurfaces, sizeof ( realDsurface_t ) );
 	AddLump( &header, &dataLength, LUMP_LIGHTMAPS, bsp->numLightmaps, 128 * 128 * 3 );
-	AddLump( &header, &dataLength, LUMP_LIGHTGRID, bsp->numGridPoints, 8 );
+	AddLump( &header, &dataLength, LUMP_LIGHTGRID, numGridPoints, 8 );
 	if ( bsp->visibilityLength ) {
 		AddLump( &header, &dataLength, LUMP_VISIBILITY, bsp->visibilityLength + VIS_HEADER, 1 );
 	}
@@ -668,7 +674,7 @@ int BSP_SaveQ3( const bspFormat_t *format, const char *name, const bspFile_t *bs
 		for ( i = 0; i < bsp->numBrushSides; i++, in++, out++ ) {
 			out->planeNum = LittleLong (in->planeNum);
 			out->shaderNum = LittleLong (in->shaderNum);
-#if 0		// NOT_SAVED
+#if 0 // NOT_SAVED
 			out->surfaceNum = -1;
 #endif
 		}
@@ -743,7 +749,17 @@ int BSP_SaveQ3( const bspFormat_t *format, const char *name, const bspFile_t *bs
 	}
 
 	WriteLump( &header, LUMP_LIGHTMAPS, data, (void *) bsp->lightmapData, sizeof ( *bsp->lightmapData ), qfalse ); /* NO SWAP */
-	WriteLump( &header, LUMP_LIGHTGRID, data, (void *) bsp->lightGridData, sizeof ( *bsp->lightGridData ), qfalse ); /* NO SWAP */
+
+	if ( bsp->numGridArrayPoints ) {
+		byte *out = GetLump( &header, data, LUMP_LIGHTGRID );
+		unsigned short *in = bsp->lightGridArray;
+
+		for ( i = 0; i < bsp->numGridArrayPoints; i++, in++, out += 8 ) {
+			Com_Memcpy( out, (byte*)&bsp->lightGridData[(*in) * 8], 8 ); /* NO SWAP */
+		}
+	} else {
+		WriteLump( &header, LUMP_LIGHTGRID, data, (void *) bsp->lightGridData, sizeof ( *bsp->lightGridData ), qfalse ); /* NO SWAP */
+	}
 
 	if ( bsp->visibilityLength )
 	{

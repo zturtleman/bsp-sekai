@@ -4,8 +4,6 @@ BSP sekai (BSP world) is a level converter for Quake 3's BSP format and games ba
 This is alpha software, there are many issues of things not properly change or removed when converting to other BSP formats.
 The only supported conversion is NSCO maps (Q3 with modified surface/content bits) to Enemy Territory BSP format.
 
-Currently, converting to or from RBSP format is not fully supported (light grid is not converted).
-
 ## Usage
 ```
 bspsekai <conversion> <input-BSP> <format> <output-BSP>
