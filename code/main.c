@@ -62,14 +62,13 @@ int main( int argc, char **argv ) {
 		Com_Printf( "<format> is used to determine output BSP format.\n" );
 		Com_Printf( "BSP format list:\n" );
 		Com_Printf( "  quake3    - Quake 3.\n" );
-		//Com_Printf( "  q3test106 - Q3Test 1.06/1.07/1.08. Later Q3Test use 'quake3' format.\n" );
+		//Com_Printf( "  q3test106 - Q3Test 1.06/1.07/1.08. Later Q3Test versions use 'quake3' format.\n" );
 		Com_Printf( "  rtcw      - Return to Castle Wolfenstein.\n" );
 		Com_Printf( "  et        - Wolfenstein: Enemy Territory.\n" );
 		Com_Printf( "  darks     - Dark Salvation.\n" );
+		//Com_Printf( "  rbsp      - Raven's BSP format used by SoF2, Jedi Knight 2, and Jedi Academy.\n" );
 		//Com_Printf( "  fakk      - Heavy Metal: FAKK2.\n" );
 		//Com_Printf( "  alice     - American McGee's Alice.\n" );
-		//Com_Printf( "  rbsp      - Raven's RBSP format used by SoF2, Jedi Knight 2, and Jedi Academy.\n" );
-		Com_Printf( "  ef        - Elite Force.\n" );
 		//Com_Printf( "  ef2       - Elite Force 2.\n" );
 		//Com_Printf( "  mohaa     - Medal of Honor Allied Assult.\n" );
 		return 0;
@@ -91,7 +90,7 @@ int main( int argc, char **argv ) {
 		return 1;
 	}
 
-	if ( Q_stricmp( formatName, "quake3" ) == 0 || Q_stricmp( formatName, "ef" ) == 0 ) {
+	if ( Q_stricmp( formatName, "quake3" ) == 0 ) {
 		outFormat = &quake3BspFormat;
 	} else if ( Q_stricmp( formatName, "rtcw" ) == 0 ) {
 		outFormat = &wolfBspFormat;
@@ -100,17 +99,17 @@ int main( int argc, char **argv ) {
 		outFormat = &wolfBspFormat;
 	} else if ( Q_stricmp( formatName, "darks" ) == 0 ) {
 		outFormat = &darksBspFormat;
+	} else if ( Q_stricmp( formatName, "rbsp" ) == 0 ) {
+		outFormat = &sof2BspFormat;
 	} else if ( Q_stricmp( formatName, "fakk" ) == 0 ) {
 		outFormat = &fakkBspFormat;
 	} else if ( Q_stricmp( formatName, "alice" ) == 0 ) {
 		outFormat = &aliceBspFormat;
-	} else if ( Q_stricmp( formatName, "rbsp" ) == 0 ) { // SoF2, JK2, JA
-		outFormat = &sof2BspFormat;
 	} else if ( Q_stricmp( formatName, "ef2" ) == 0 ) {
 		outFormat = &ef2BspFormat;
 	} else if ( Q_stricmp( formatName, "mohaa" ) == 0 ) {
 		outFormat = &mohaaBspFormat;
-	} else if ( Q_stricmp( formatName, "q3test106" ) == 0 || Q_stricmp( formatName, "q3test107" ) == 0 || Q_stricmp( formatName, "q3test108" ) == 0 ) {
+	} else if ( Q_stricmp( formatName, "q3test106" ) == 0 ) {
 		outFormat = &q3Test106BspFormat;
 	} else {
 		Com_Printf( "Error: Unknown format '%s'.\n", formatName );
