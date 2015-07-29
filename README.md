@@ -52,7 +52,7 @@ Return to Castle Wolfenstein | IBSP 47  | different version than Q3
 Wolfenstein: Enemy Territory | IBSP 47  | adds foliage surface type
 QuakeLive                    | IBSP 47  | advertisements lump is ignored
 Dark Salvation               | IBSP 666 | different version than Q3
-Soldier of Fortune 2         | RBSP 1   | missing light styles support
+Soldier of Fortune 2         | RBSP 1   | light styles are ignored
 Heavy Metal: F.A.K.K.2       | FAKK 12  | major differences from Q3, not fully supported
 American McGee's Alice       | FAKK 42  | different version than FAKK, not fully supported
 Medal of Honor Allied Assult | 2015 19  | major differences from FAKK, not fully supported
