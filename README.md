@@ -61,3 +61,15 @@ Elite Force 2                | EF2! 20  | major differences from FAKK, not fully
 ## License
 BSP sekai is licensed under a [modified version of the GNU GPLv3](https://github.com/zturtleman/bsp-sekai/blob/master/COPYING.txt#L625) (or at your option, any later version). The license is also used by Spearmint, Return to Castle Wolfenstein, Wolfenstein: Enemy Territory, and Doom 3.
 
+## Compiling
+BSP sekai uses CMake for generating the build system.
+
+For example on GNU/Linux with git and cmake installed:
+
+  git clone https://github.com/zturtleman/bsp-sekai.git
+  cd bsp-sekai
+  mkdir build
+  cd build
+  cmake -G "Unix Makefiles" ..
+  make
+
