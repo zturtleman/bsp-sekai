@@ -73,3 +73,12 @@ For example on GNU/Linux with git and cmake installed:
     cmake -G "Unix Makefiles" ..
     make
 
+Cross-compile for Windows on GNU/Linux with git, cmake, and mingw-w64 installed:
+
+    git clone https://github.com/zturtleman/bsp-sekai.git
+    cd bsp-sekai
+    mkdir build-mingw
+    cd build-mingw
+    cmake -DCMAKE_TOOLCHAIN_FILE=../toolchain-cross-mingw32-linux.cmake -G "Unix Makefiles" ..
+    make
+
