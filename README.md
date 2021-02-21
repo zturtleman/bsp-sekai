@@ -1,5 +1,5 @@
 # BSP sekai
-BSP sekai (BSP world) is a level converter for Quake 3's BSP format and games based on it. It is based on the BSP loaders in the [Spearmint engine](http://spearmint.pw).
+BSP sekai (BSP world) is a level converter for Quake 3's BSP format and games based on it. It is based on the BSP loaders in the [Spearmint engine](https://clover.moe/spearmint).
 
 This is alpha software, there are many issues of things not properly change or removed when converting to other BSP formats.
 The only supported conversion is NSCO maps (Q3 with modified surface/content bits) to Enemy Territory BSP format.
