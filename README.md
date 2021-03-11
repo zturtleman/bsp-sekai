@@ -7,7 +7,7 @@ The only supported conversion is NSCO maps (Q3 with modified surface/content bit
 ## Usage
 ```
 bspsekai <conversion> <input-BSP> <format> <output-BSP>
-BSP sekai - v0.1
+BSP sekai - v0.2
 Convert a BSP for use on a different engine
 BSP conversion can lose data, keep the original BSP!
 

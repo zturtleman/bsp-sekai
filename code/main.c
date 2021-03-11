@@ -45,7 +45,7 @@ int main( int argc, char **argv ) {
 
 	if ( argc < 5 ) {
 		Com_Printf( "bspsekai <conversion> <input-BSP> <format> <output-BSP>\n" );
-		Com_Printf( "BSP sekai - v0.1\n" );
+		Com_Printf( "BSP sekai - v0.2\n" );
 		Com_Printf( "Convert a BSP for use on a different engine\n" );
 		Com_Printf( "BSP conversion can lose data, keep the original BSP!\n" );
 		Com_Printf( "\n" );
