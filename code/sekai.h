@@ -73,3 +73,6 @@ long FS_WriteFile( const char *filename, void *buf, long length );
 long FS_ReadFile( const char *filename, void **buffer );
 void FS_FreeFile( void *buffer );
 
+// md4.c
+unsigned Com_BlockChecksum (const void *buffer, int length);
+
