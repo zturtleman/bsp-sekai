@@ -19,7 +19,7 @@ Conversion list:
 
 The format of <input-BSP> is automatically determined from the file.
 Input BSP formats: (not all are fully supported)
-  Quake 3, RTCW, ET, EF, EF2, FAKK, Alice, Dark Salvation, MOHAA, Q3Test 1.06 or later, SoF2, JK2, JA
+  Quake 3 (including pre-releases formats), RTCW, ET, EF, EF2, FAKK, Alice, Dark Salvation, MOHAA, SoF2, JK2, JA
 
 <format> is used to determine output BSP format.
 BSP format list:
@@ -46,8 +46,10 @@ Dark Salvation               | IBSP 666
 ### Read formats
 Game | BSP ident & version | notes
 ---- | ---- | ----
+Q3 IHV test                  | IBSP 43
+Q3Test 1.03/1.05             | IBSP 44  | does Q3Test 1.04 exist?
 Q3Test 1.06/1.07/1.08        | IBSP 45
-Quake III Arena              | IBSP 46
+Quake III Arena              | IBSP 46  | also used by Q3Test 1.09+
 Return to Castle Wolfenstein | IBSP 47  | different version than Q3
 Wolfenstein: Enemy Territory | IBSP 47  | adds foliage surface type
 QuakeLive                    | IBSP 47  | advertisements lump is ignored
