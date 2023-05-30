@@ -55,7 +55,7 @@ Wolfenstein: Enemy Territory | IBSP 47  | adds foliage surface type
 QuakeLive                    | IBSP 47  | advertisements lump is ignored
 Iron-Grid: Warlord           | IBSP 48  | adds unknown an variable (flags?) to brushside
 Dark Salvation               | IBSP 666 | different version than Q3
-Soldier of Fortune 2         | RBSP 1   | light styles are ignored
+Soldier of Fortune 2         | RBSP 1   | minor differences from Q3, light styles are not implemented
 Heavy Metal: F.A.K.K.2       | FAKK 12  | major differences from Q3, not fully supported
 American McGee's Alice       | FAKK 42  | different version than FAKK, not fully supported
 Medal of Honor Allied Assult | 2015 19  | major differences from FAKK, not fully supported
