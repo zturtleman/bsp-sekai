@@ -19,7 +19,7 @@ Conversion list:
 
 The format of <input-BSP> is automatically determined from the file.
 Input BSP formats: (not all are fully supported)
-  Quake 3 (including pre-releases formats), RTCW, ET, EF, EF2, FAKK, Alice, Dark Salvation, MOHAA, SoF2, JK2, JA
+  Quake 3 (including pre-releases formats), RTCW, ET, EF, EF2, FAKK, Alice, Dark Salvation, MOHAA, SoF2, JK2, JA, Iron-Grid: Warlord
 
 <format> is used to determine output BSP format.
 BSP format list:
@@ -53,6 +53,7 @@ Quake III Arena              | IBSP 46  | also used by Q3Test 1.09+
 Return to Castle Wolfenstein | IBSP 47  | different version than Q3
 Wolfenstein: Enemy Territory | IBSP 47  | adds foliage surface type
 QuakeLive                    | IBSP 47  | advertisements lump is ignored
+Iron-Grid: Warlord           | IBSP 48  | adds unknown an variable (flags?) to brushside
 Dark Salvation               | IBSP 666 | different version than Q3
 Soldier of Fortune 2         | RBSP 1   | light styles are ignored
 Heavy Metal: F.A.K.K.2       | FAKK 12  | major differences from Q3, not fully supported
