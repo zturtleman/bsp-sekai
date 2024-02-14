@@ -46,6 +46,7 @@ bspFormat_t *bspFormats[] = {
 	&ef2BspFormat,
 	&mohaaBspFormat,
 	&q3Test106BspFormat,
+	&daikatanaBspFormat,
 };
 
 const int numBspFormats = ARRAY_LEN( bspFormats );
@@ -53,6 +54,36 @@ const int numBspFormats = ARRAY_LEN( bspFormats );
 #define MAX_BSP_FILES 1
 bspFile_t *bsp_loadedFiles[MAX_BSP_FILES] = {0};
 
+/*
+============
+COM_StripExtension
+============
+*/
+void COM_StripExtension( const char *in, char *out ) {
+	while ( *in && *in != '.' ) {
+		*out++ = *in++;
+	}
+	*out = 0;
+}
+
+/*
+============
+COM_SkipPath
+============
+*/
+char *COM_SkipPath (char *pathname)
+{
+	char	*last;
+	
+	last = pathname;
+	while (*pathname)
+	{
+		if (*pathname=='/')
+			last = pathname+1;
+		pathname++;
+	}
+	return last;
+}
 
 bspFile_t *BSP_Load( const char *name ) {
 	union {
@@ -134,6 +165,7 @@ bspFile_t *BSP_Load( const char *name ) {
 }
 
 static void BSP_FreeInternal( bspFile_t *bsp ) {
+	free( bsp->shaderString );
 	free( bsp->entityString );
 	free( bsp->shaders );
 	free( bsp->planes );

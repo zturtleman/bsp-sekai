@@ -15,10 +15,16 @@ set( BSP_SRCS
 	code/bsp_q3.c
 	code/bsp_q3test106.c
 	code/bsp_sof2.c
+	code/bsp_dk.c
 	code/convert_nsco.c
 	code/main.c
 	code/md4.c
+	code/image.c
+	code/image_tga.c
+	code/xbuf.c
+	code/entity.c
+	code/strbuf.c
 )
 
 add_executable(bspsekai ${BSP_SRCS})
-
+target_link_libraries(bspsekai m)

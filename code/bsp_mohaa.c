@@ -323,6 +323,9 @@ bspFile_t *BSP_LoadMOHAA( const bspFormat_t *format, const char *name, const voi
 	//
 	// count and alloc
 	//
+	bsp->shaderStringLength = 0;
+	bsp->shaderString = NULL;
+
 	bsp->entityStringLength = GetLumpElements( &header, LUMP_ENTITIES, 1 );
 	bsp->entityString = malloc( bsp->entityStringLength );
 
@@ -504,12 +507,12 @@ bspFile_t *BSP_LoadMOHAA( const bspFormat_t *format, const char *name, const voi
 			}
 			for ( j = 0 ; j < 2 ; j++ ) {
 				out->st[j] = LittleFloat( in->st[j] );
-				out->lightmap[j] = LittleFloat( in->lightmap[j] );
+				out->lightmap[0][j] = LittleFloat( in->lightmap[j] );
 			}
 
 			/* NO SWAP */
 			for ( j = 0; j < 4; j++ ) {
-				out->color[j] = in->color[j];
+				out->color[0][j] = in->color[j];
 			}
 		}
 	}
@@ -541,9 +544,9 @@ bspFile_t *BSP_LoadMOHAA( const bspFormat_t *format, const char *name, const voi
 			out->numVerts = LittleLong (in->numVerts);
 			out->firstIndex = LittleLong (in->firstIndex);
 			out->numIndexes = LittleLong (in->numIndexes);
-			out->lightmapNum = LittleLong (in->lightmapNum);
-			out->lightmapX = LittleLong (in->lightmapX);
-			out->lightmapY = LittleLong (in->lightmapY);
+			out->lightmapNum[0] = LittleLong (in->lightmapNum);
+			out->lightmapX[0] = LittleLong (in->lightmapX);
+			out->lightmapY[0] = LittleLong (in->lightmapY);
 			out->lightmapWidth = LittleLong (in->lightmapWidth);
 			out->lightmapHeight = LittleLong (in->lightmapHeight);
 
@@ -580,11 +583,11 @@ bspFile_t *BSP_LoadMOHAA( const bspFormat_t *format, const char *name, const voi
 			out->numVerts = 9 * 9;
 			out->firstIndex = bsp->numDrawIndexes + i * 8 * 8 * 6;
 			out->numIndexes = 8 * 8 * 6;
-			out->lightmapNum = LittleShort (in->lightmap);
+			out->lightmapNum[0] = LittleShort (in->lightmap);
 
 			// lightmap x,y,width,height aren't used for anything
-			out->lightmapX = 0;
-			out->lightmapY = 0;
+			out->lightmapX[0] = 0;
+			out->lightmapY[0] = 0;
 			out->lightmapWidth = 0;
 			out->lightmapHeight = 0;
 
@@ -635,13 +638,13 @@ bspFile_t *BSP_LoadMOHAA( const bspFormat_t *format, const char *name, const voi
 
 					f = x / 8.f;
 					vert->st[0] = texCoords[0] + f * distU;
-					vert->lightmap[0] = texCoords[1] + f * TERRAIN_LM_LENGTH;
+					vert->lightmap[0][0] = texCoords[1] + f * TERRAIN_LM_LENGTH;
 					f = y / 8.f;
 					vert->st[1] = texCoords[6] + f * distV;
-					vert->lightmap[1] = texCoords[3] + f * TERRAIN_LM_LENGTH;
+					vert->lightmap[0][1] = texCoords[3] + f * TERRAIN_LM_LENGTH;
 
 					for ( j = 0; j < 4; j++ ) {
-						vert->color[j] = 0;
+						vert->color[0][j] = 0;
 					}
 				}
 			}
@@ -727,6 +730,7 @@ bspFormat_t mohaaBspFormat = {
 	"MOHAA",
 	BSP_IDENT,
 	BSP_VERSION,
+	NULL,
 	BSP_LoadMOHAA,
 };
 

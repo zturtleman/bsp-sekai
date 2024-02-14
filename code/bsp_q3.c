@@ -265,6 +265,9 @@ bspFile_t *BSP_LoadQ3( const bspFormat_t *format, const char *name, const void *
 	//
 	// count and alloc
 	//
+	bsp->shaderStringLength = 0;
+	bsp->shaderString = NULL;
+
 	bsp->entityStringLength = GetLumpElements( &header, LUMP_ENTITIES, 1 );
 	bsp->entityString = malloc( bsp->entityStringLength );
 
@@ -440,12 +443,12 @@ bspFile_t *BSP_LoadQ3( const bspFormat_t *format, const char *name, const void *
 			}
 			for ( j = 0 ; j < 2 ; j++ ) {
 				out->st[j] = LittleFloat( in->st[j] );
-				out->lightmap[j] = LittleFloat( in->lightmap[j] );
+				out->lightmap[0][j] = LittleFloat( in->lightmap[j] );
 			}
 
 			/* NO SWAP */
 			for ( j = 0; j < 4; j++ ) {
-				out->color[j] = in->color[j];
+				out->color[0][j] = in->color[j];
 			}
 		}
 	}
@@ -475,9 +478,9 @@ bspFile_t *BSP_LoadQ3( const bspFormat_t *format, const char *name, const void *
 			out->numVerts = LittleLong (in->numVerts);
 			out->firstIndex = LittleLong (in->firstIndex);
 			out->numIndexes = LittleLong (in->numIndexes);
-			out->lightmapNum = LittleLong (in->lightmapNum);
-			out->lightmapX = LittleLong (in->lightmapX);
-			out->lightmapY = LittleLong (in->lightmapY);
+			out->lightmapNum[0] = LittleLong (in->lightmapNum);
+			out->lightmapX[0] = LittleLong (in->lightmapX);
+			out->lightmapY[0] = LittleLong (in->lightmapY);
 			out->lightmapWidth = LittleLong (in->lightmapWidth);
 			out->lightmapHeight = LittleLong (in->lightmapHeight);
 
@@ -716,12 +719,12 @@ int BSP_SaveQ3( const bspFormat_t *format, const char *name, const bspFile_t *bs
 			}
 			for ( j = 0 ; j < 2 ; j++ ) {
 				out->st[j] = LittleFloat( in->st[j] );
-				out->lightmap[j] = LittleFloat( in->lightmap[j] );
+				out->lightmap[j] = LittleFloat( in->lightmap[0][j] );
 			}
 
 			/* NO SWAP */
 			for ( j = 0; j < 4; j++ ) {
-				out->color[j] = in->color[j];
+				out->color[j] = in->color[0][j];
 			}
 		}
 	}
@@ -751,9 +754,9 @@ int BSP_SaveQ3( const bspFormat_t *format, const char *name, const bspFile_t *bs
 			out->numVerts = LittleLong (in->numVerts);
 			out->firstIndex = LittleLong (in->firstIndex);
 			out->numIndexes = LittleLong (in->numIndexes);
-			out->lightmapNum = LittleLong (in->lightmapNum);
-			out->lightmapX = LittleLong (in->lightmapX);
-			out->lightmapY = LittleLong (in->lightmapY);
+			out->lightmapNum = LittleLong (in->lightmapNum[0]);
+			out->lightmapX = LittleLong (in->lightmapX[0]);
+			out->lightmapY = LittleLong (in->lightmapY[0]);
 			out->lightmapWidth = LittleLong (in->lightmapWidth);
 			out->lightmapHeight = LittleLong (in->lightmapHeight);
 
@@ -811,6 +814,7 @@ bspFormat_t quake3BspFormat = {
 	"Quake3",
 	BSP_IDENT,
 	Q3_BSP_VERSION,
+	"scripts",
 	BSP_LoadQ3,
 	BSP_SaveQ3,
 };
@@ -820,6 +824,7 @@ bspFormat_t wolfBspFormat = {
 	"RTCW/ET",
 	BSP_IDENT,
 	WOLF_BSP_VERSION,
+	"scripts",
 	BSP_LoadQ3,
 	BSP_SaveQ3,
 };
@@ -829,6 +834,7 @@ bspFormat_t darksBspFormat = {
 	"DarkSalvation",
 	BSP_IDENT,
 	DARKS_BSP_VERSION,
+	NULL,
 	BSP_LoadQ3,
 	BSP_SaveQ3,
 };

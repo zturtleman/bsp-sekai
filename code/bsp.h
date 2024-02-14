@@ -37,6 +37,8 @@ Suite 120, Rockville, Maryland 20850 USA.
 
 */
 
+#define MAXLIGHTMAPS 4
+
 typedef struct {
 	float		mins[3], maxs[3];
 	int			firstSurface, numSurfaces;
@@ -98,9 +100,9 @@ typedef struct {
 typedef struct {
 	vec3_t		xyz;
 	float		st[2];
-	float		lightmap[2];
+	float		lightmap[MAXLIGHTMAPS][2];
 	vec3_t		normal;
-	byte		color[4];
+	byte		color[MAXLIGHTMAPS][4];
 } drawVert_t;
 
 #define drawVert_t_cleared(x) drawVert_t (x) = {{0, 0, 0}, {0, 0}, {0, 0}, {0, 0, 0}, {0, 0, 0, 0}}
@@ -127,8 +129,9 @@ typedef struct {
 	int			firstIndex;
 	int			numIndexes;
 
-	int			lightmapNum;
-	int			lightmapX, lightmapY;
+	byte		lightmapStyles[MAXLIGHTMAPS], vertexStyles[MAXLIGHTMAPS];
+	int			lightmapNum[MAXLIGHTMAPS];
+	int			lightmapX[MAXLIGHTMAPS], lightmapY[MAXLIGHTMAPS];
 	int			lightmapWidth, lightmapHeight;
 
 	vec3_t		lightmapOrigin;
@@ -202,6 +205,9 @@ typedef struct {
 	byte			*visibility;
 	int				visibilityLength;
 
+	int				shaderStringLength;
+	char			*shaderString;
+
 } bspFile_t;
 
 //
@@ -221,9 +227,13 @@ typedef struct bspFormat_s {
 	const char *gameName;
 	int			ident;
 	int			version;
+	const char *shaderDir;
 	bspFile_t	*(*loadFunction)( const struct bspFormat_s *format, const char *name, const void *data, int length );
 	int			(*saveFunction)( const struct bspFormat_s *format, const char *name, const bspFile_t *bsp, void **dataOut );
 } bspFormat_t;
+
+// bsp_dk.c
+extern bspFormat_t daikatanaBspFormat;
 
 // bsp_q3.c
 extern bspFormat_t quake3BspFormat;

@@ -36,6 +36,9 @@ void ConvertNscoToNscoET( bspFile_t *bsp );
 void ConvertNscoETToNsco( bspFile_t *bsp );
 
 int main( int argc, char **argv ) {
+	char baseFile[1024];
+	char shaderOutputFile[1024];
+	char *mapName;
 	bspFile_t *bsp;
 	int saveLength;
 	void *saveData;
@@ -57,7 +60,7 @@ int main( int argc, char **argv ) {
 		Com_Printf( "\n" );
 		Com_Printf( "The format of <input-BSP> is automatically determined from the file.\n" );
 		Com_Printf( "Input BSP formats: (not all are fully supported)\n" );
-		Com_Printf( "  Quake 3, RTCW, ET, EF, EF2, FAKK, Alice, Dark Salvation, MOHAA, Q3Test 1.06 or later, SoF2, JK2, JA\n" );
+		Com_Printf( "  Quake 3, RTCW, ET, EF, EF2, FAKK, Alice, Dark Salvation, MOHAA, Q3Test 1.06 or later, SoF2, JK2, JA, Daikatana\n" );
 		Com_Printf( "\n" );
 		Com_Printf( "<format> is used to determine output BSP format.\n" );
 		Com_Printf( "BSP format list:\n" );
@@ -71,6 +74,7 @@ int main( int argc, char **argv ) {
 		//Com_Printf( "  alice     - American McGee's Alice.\n" );
 		//Com_Printf( "  ef2       - Elite Force 2.\n" );
 		//Com_Printf( "  mohaa     - Medal of Honor Allied Assult.\n" );
+		Com_Printf( "  dk        - Daikatana.\n" );
 		return 0;
 	}
 
@@ -111,6 +115,8 @@ int main( int argc, char **argv ) {
 		outFormat = &mohaaBspFormat;
 	} else if ( Q_stricmp( formatName, "q3test106" ) == 0 ) {
 		outFormat = &q3Test106BspFormat;
+	} else if ( Q_stricmp( formatName, "dk" ) == 0 ) {
+		outFormat = &daikatanaBspFormat;
 	} else {
 		Com_Printf( "Error: Unknown format '%s'.\n", formatName );
 		return 1;
@@ -146,6 +152,16 @@ int main( int argc, char **argv ) {
 
 		if ( saveData && FS_WriteFile( outputFile, saveData, saveLength ) == saveLength ) {
 			Com_Printf( "Saved BSP '%s' successfully.\n", outputFile );
+
+			COM_StripExtension( outputFile, baseFile );
+			mapName = COM_SkipPath( baseFile );
+			sprintf( shaderOutputFile, "%s/%s_gen.shader", outFormat->shaderDir ? outFormat->shaderDir : "scripts", mapName );
+
+			if  ( bsp->shaderString && FS_WriteFile( shaderOutputFile, bsp->shaderString, bsp->shaderStringLength ) ) {
+				Com_Printf( "Saved generated shaders to '%s' successfully.\n", shaderOutputFile );
+			} else {
+				Com_Printf( "Saving generated shaders to '%s' failed.\n", shaderOutputFile );
+			}
 		} else {
 			Com_Printf( "Saving BSP '%s' failed.\n", outputFile );
 		}
