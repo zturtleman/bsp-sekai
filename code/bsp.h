@@ -239,9 +239,17 @@ extern bspFormat_t daikatanaBspFormat;
 extern bspFormat_t quake3BspFormat;
 extern bspFormat_t wolfBspFormat;
 extern bspFormat_t darksBspFormat;
+extern bspFormat_t warlordBspFormat;
 
 // bsp_q3test106.c
 extern bspFormat_t q3Test106BspFormat;
+extern bspFormat_t s3quake3BspFormat;
+
+// bsp_q3test103.c
+extern bspFormat_t q3Test103BspFormat;
+
+// bsp_q3ihv.c
+extern bspFormat_t q3IHVBspFormat;
 
 // bsp_fakk.c
 extern bspFormat_t fakkBspFormat;

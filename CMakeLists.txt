@@ -13,6 +13,8 @@ set( BSP_SRCS
 	code/bsp_fakk.c
 	code/bsp_mohaa.c
 	code/bsp_q3.c
+	code/bsp_q3ihv.c
+	code/bsp_q3test103.c
 	code/bsp_q3test106.c
 	code/bsp_sof2.c
 	code/bsp_dk.c

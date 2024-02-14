@@ -33,6 +33,7 @@ Suite 120, Rockville, Maryland 20850 USA.
 #include <stdio.h>
 #include <string.h>
 
+typedef float vec_t;
 typedef float vec3_t[3];
 typedef uint8_t byte;
 
@@ -70,6 +71,8 @@ char *COM_SkipPath( char *pathname );
 #define VectorSet( v, a, b, c ) do { v[0] = a; v[1] = b; v[2] = c; } while (0)
 #define VectorCopy( src, dst ) do { dst[0] = src[0]; dst[1] = src[2]; dst[2] = src[2]; } while (0)
 
+#define MIN( x, y ) ( (x) < (y) ? (x) : (y) )
+#define MAX( x, y ) ( (x) > (y) ? (x) : (y) )
 
 // main.c
 long FS_WriteFile( const char *filename, void *buf, long length );

@@ -60,7 +60,7 @@ int main( int argc, char **argv ) {
 		Com_Printf( "\n" );
 		Com_Printf( "The format of <input-BSP> is automatically determined from the file.\n" );
 		Com_Printf( "Input BSP formats: (not all are fully supported)\n" );
-		Com_Printf( "  Quake 3, RTCW, ET, EF, EF2, FAKK, Alice, Dark Salvation, MOHAA, Q3Test 1.06 or later, SoF2, JK2, JA, Daikatana\n" );
+		Com_Printf( "  Quake 3 (including pre-releases formats), RTCW, ET, EF, EF2, FAKK, Alice, Dark Salvation, MOHAA, SoF2, JK2, JA, Iron-Grid: Warlord, Daikatana\n" );
 		Com_Printf( "\n" );
 		Com_Printf( "<format> is used to determine output BSP format.\n" );
 		Com_Printf( "BSP format list:\n" );
