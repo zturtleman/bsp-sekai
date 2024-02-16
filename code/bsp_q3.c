@@ -865,6 +865,7 @@ bspFormat_t warlordBspFormat = {
 	"IronGripWarlord",
 	BSP_IDENT,
 	WARLORD_BSP_VERSION,
+	NULL,
 	BSP_LoadQ3,
 	NULL,
 };

@@ -505,6 +505,7 @@ bspFormat_t s3quake3BspFormat = {
 	"S3Quake3",
 	BSP_IDENT,
 	S3Q3_BSP_VERSION,
+	"scripts",
 	BSP_LoadQ3Test106,
 };
 

@@ -661,12 +661,12 @@ bspFile_t *BSP_LoadQ3Test103( const bspFormat_t *format, const char *name, const
 			}
 			for ( j = 0 ; j < 2 ; j++ ) {
 				out->st[j] = LittleFloat( in->st[j] );
-				out->lightmap[j] = LittleFloat( in->lightmap[j] );
+				out->lightmap[0][j] = LittleFloat( in->lightmap[j] );
 			}
 
 			/* NO SWAP */
 			for ( j = 0; j < 4; j++ ) {
-				out->color[j] = in->color[j];
+				out->color[0][j] = in->color[j];
 			}
 
 #ifdef BSP_DEBUG
@@ -721,9 +721,9 @@ bspFile_t *BSP_LoadQ3Test103( const bspFormat_t *format, const char *name, const
 			out->numVerts = LittleLong (in->numVerts);
 			out->firstIndex = LittleLong (in->firstIndex);
 			out->numIndexes = LittleLong (in->numIndexes);
-			out->lightmapNum = LittleLong (in->lightmapNum);
-			out->lightmapX = LittleLong (in->lightmapX);
-			out->lightmapY = LittleLong (in->lightmapY);
+			out->lightmapNum[0] = LittleLong (in->lightmapNum);
+			out->lightmapX[0] = LittleLong (in->lightmapX);
+			out->lightmapY[0] = LittleLong (in->lightmapY);
 			out->lightmapWidth = LittleLong (in->lightmapWidth);
 			out->lightmapHeight = LittleLong (in->lightmapHeight);
 
@@ -979,6 +979,7 @@ bspFormat_t q3Test103BspFormat = {
 	"Q3Test 1.03/1.05",
 	BSP_IDENT,
 	BSP_VERSION,
+	"scripts",
 	BSP_LoadQ3Test103,
 };
 
