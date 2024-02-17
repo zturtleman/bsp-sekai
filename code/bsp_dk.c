@@ -445,6 +445,8 @@ typedef struct mtexinfo_s
 	int value;
 	int					duplicate;
 	struct mtexinfo_s	*hash_next;
+	qboolean			skip; // this should not be rendered at all (e.g. clip)
+	int					shaderNum;
 } mtexinfo_t;
 
 typedef struct glpoly_s
@@ -566,6 +568,8 @@ typedef struct
 	int			visleafs;		// not including the solid leaf 0
 	int			firstface, numfaces;
 } mmodel_t;
+
+#define VIEWFOGS 0
 
 typedef struct
 {
@@ -2112,7 +2116,12 @@ static void OutputGeneratedFogShaders( const char *basename, mfog_t *fogs, int n
 	int		i;
 	mfog_t	*fog;
 	char	line[2048];
-	
+
+	if (VIEWFOGS)
+	{
+		return;
+	}
+
 	for (i=0 ; i< numFogs ; i++)
 	{
 		fog = &fogs[i];
@@ -2146,7 +2155,7 @@ static void OutputGeneratedFogShaders( const char *basename, mfog_t *fogs, int n
 	}
 }
 
-static void OutputTexInfoShaders( const char *basename, msurface_t *faces, int numFaces, skybox_t *skybox, mfog_t *fogs, int numFogs, bspFile_t *bsp )
+static void OutputTexInfoShaders( const char *basename, msurface_t *faces, int numFaces, mtexinfo_t *texInfos, int numTexInfos, skybox_t *skybox, mfog_t *fogs, int numFogs, bspFile_t *bsp )
 {
 	int		i, j, len, size;
 	static char	filedata[16384 * 1024];
@@ -2162,6 +2171,44 @@ static void OutputTexInfoShaders( const char *basename, msurface_t *faces, int n
 	OutputGeneratedFogShaders( basename, fogs, numFogs, &stringbuf );
 
 	SkyBoxPrint( basename, skybox, &stringbuf );
+
+	if (VIEWFOGS)
+	{
+		for ( i = 0, tex = texInfos; i < numTexInfos; i++, tex++ ) {
+			if ( !(tex->flags & SURF_FOGPLANE) )
+			{
+				continue;
+			}
+
+			sprintf (line, "texinfo_%d\n", i);
+			AppendToBuffer( &stringbuf, line );
+
+			AppendToBuffer( &stringbuf, "{\n" );
+
+			float	color[3];
+			float	distance;
+
+			color[0] = ( float )( tex->color[0] ) / 255.0;
+			color[1] = ( float )( tex->color[1] ) / 255.0;
+			color[2] = ( float )( tex->color[2] ) / 255.0;
+
+			distance = tex->value;
+			if( distance == 0 )
+			{
+				distance = 128;
+			}
+
+			sprintf( line, "surfaceparm trans\nsurfaceparm nonsolid\nsurfaceparm nolightmap\n" );
+			AppendToBuffer( &stringbuf, line );
+
+			sprintf(line, "viewfogvars ( %f %f %f ) %f\n",
+				color[0], color[1], color[2], distance);
+			AppendToBuffer( &stringbuf, line );
+
+			AppendToBuffer( &stringbuf, "}\n" );
+		}
+	}
+
 #if 0
 	// deduplicate all texinfos. if two texinfos have same texture, flags -- they are the same shader
 	//    - skip a texinfo that is not the first frame of animation
@@ -2506,6 +2553,20 @@ static void ProcessTexInfo( bspFile_t *bsp, const void *data, dheader_t *header,
 			out->image = image_notexture;
 		}
 		out->hash_next = NULL;
+
+		// skip editor-only texinfos
+		if (StringEndsWith(out->image->name, "clip.tga"))
+		{
+			out->skip = qtrue;
+		}
+		else if (StringEndsWith(out->image->name, "trigger.tga"))
+		{
+			out->skip = qtrue;
+		}
+		else if (StringEndsWith(out->image->name, "hint.tga"))
+		{
+			out->skip = qtrue;
+		}
 	}
 
 	// count animation frames
@@ -2651,6 +2712,11 @@ static void ConvertSurfaces( bspFile_t *bsp, msurface_t *faces, int numFaces, mt
 	for (i = 0; i < numFaces; i++)
 	{
 		msurface_t *face = &faces[i];
+
+		if (face->texinfo->skip) {
+			continue; // texinfo has no shader: skip this
+		}
+
 		numDrawVerts += face->polys->numverts;
 		numIndexes += (face->polys->numverts - 2) * 3;
 	}
@@ -2659,12 +2725,14 @@ static void ConvertSurfaces( bspFile_t *bsp, msurface_t *faces, int numFaces, mt
 	bsp->drawVerts = malloc( numDrawVerts * sizeof( *bsp->drawVerts ) );
 	bsp->numDrawIndexes = 0;
 	bsp->drawIndexes = malloc( numIndexes * sizeof( *bsp->drawIndexes ) );
-	bsp->numSurfaces = numFaces;
-	bsp->surfaces = malloc( bsp->numSurfaces * sizeof( *bsp->surfaces ) );
+	int maxSurfaces = numFaces;
+	int numSurfaces = 0;
+	bsp->surfaces = malloc( maxSurfaces * sizeof( *bsp->surfaces ) );
 	for (i = 0; i < numFaces; i++)
 	{
 		msurface_t *in = &faces[i];
-		dsurface_t *out = &bsp->surfaces[i];
+
+		dsurface_t *out = &bsp->surfaces[numSurfaces++];
 		int *index;
 
 		//if ((in->flags & SURF_FOGPLANE) || (in->texinfo->flags & SURF_FOGPLANE)) {
@@ -2672,35 +2740,56 @@ static void ConvertSurfaces( bspFile_t *bsp, msurface_t *faces, int numFaces, mt
 		//}
 
 #if 1
-		out->shaderNum = in->texinfo - texInfo;
+		out->shaderNum = in->texinfo->shaderNum;
 #else
 		out->shaderNum = in->shaderNum;
 #endif
-		out->fogNum = out->fogNum; // 0 if no fogs
+		if (VIEWFOGS)
+		{
+			out->fogNum = in->fogNum;
+		}
+		else
+		{
+			out->fogNum = in->fogNum; // 0 if no fogs
+		}
 		out->surfaceType = MST_PLANAR;
 
 		// convert vertices
 		out->firstVert = bsp->numDrawVerts;
-		out->numVerts = in->polys->numverts;
-		bsp->numDrawVerts += out->numVerts;
-		memcpy(bsp->drawVerts + out->firstVert, in->polys->verts, out->numVerts * sizeof(*bsp->drawVerts));
-		for (j = 0; j < out->numVerts; j++)
+		if (in->texinfo->skip)
 		{
-			bsp->drawVerts[out->firstVert + j].color[0][0] = in->texinfo->color[0];
-			bsp->drawVerts[out->firstVert + j].color[0][1] = in->texinfo->color[1];
-			bsp->drawVerts[out->firstVert + j].color[0][2] = in->texinfo->color[2];
-			bsp->drawVerts[out->firstVert + j].color[0][3] = 255;
+			out->numVerts = 0;
+		}
+		else
+		{
+			out->numVerts = in->polys->numverts;
+			bsp->numDrawVerts += out->numVerts;
+			memcpy(bsp->drawVerts + out->firstVert, in->polys->verts, out->numVerts * sizeof(*bsp->drawVerts));
+			for (j = 0; j < out->numVerts; j++)
+			{
+				bsp->drawVerts[out->firstVert + j].color[0][0] = in->texinfo->color[0];
+				bsp->drawVerts[out->firstVert + j].color[0][1] = in->texinfo->color[1];
+				bsp->drawVerts[out->firstVert + j].color[0][2] = in->texinfo->color[2];
+				bsp->drawVerts[out->firstVert + j].color[0][3] = 255;
+			}
 		}
 
 		// convert indices
 		out->firstIndex = bsp->numDrawIndexes;
-		out->numIndexes = (in->polys->numverts - 2) * 3;
-		bsp->numDrawIndexes += out->numIndexes;
-		index = &bsp->drawIndexes[out->firstIndex];
-		for (k = 0, j = 2; k < out->numIndexes; k += 3, j++) {
-			index[k + 0] = 0;
-			index[k + 1] = j - 1;
-			index[k + 2] = j;
+		if (in->texinfo->skip)
+		{
+			out->numIndexes = 0;
+		}
+		else
+		{
+			out->numIndexes = (in->polys->numverts - 2) * 3;
+			bsp->numDrawIndexes += out->numIndexes;
+			index = &bsp->drawIndexes[out->firstIndex];
+			for (k = 0, j = 2; k < out->numIndexes; k += 3, j++) {
+				index[k + 0] = 0;
+				index[k + 1] = j - 1;
+				index[k + 2] = j;
+			}
 		}
 
 		out->lightmapNum[0] = in->lightmaptexturenum;
@@ -2722,6 +2811,7 @@ static void ConvertSurfaces( bspFile_t *bsp, msurface_t *faces, int numFaces, mt
 		out->lightmapVecs[2][1] = in->plane->normal[1];
 		out->lightmapVecs[2][2] = in->plane->normal[2];
 	}
+	bsp->numSurfaces = numSurfaces;
 }
 
 static qboolean outputJKA = qfalse; // TODO: make it truly switchable
@@ -2893,15 +2983,16 @@ bspFile_t *BSP_LoadDK( const bspFormat_t *format, const char *name, const void *
 
 	// NOTE: for JKA only, add an extra "outside" shader
 	int outsideShaderNum = numTexInfo - 1;
-	bsp->numShaders = numTexInfo + 1; // outside
-	bsp->shaders = malloc( bsp->numShaders * sizeof( *bsp->shaders ) );
-	Q_strncpyz( bsp->shaders[outsideShaderNum].shader, "textures/system/outside", sizeof( bsp->shaders[outsideShaderNum].shader ) );
-	bsp->shaders[outsideShaderNum].contentFlags |= JKA_CONTENTS_OUTSIDE;
-	bsp->shaders[outsideShaderNum].surfaceFlags = 0;
+	int maxShaders = numTexInfo + 1; // outside
+	int numShaders = 0;
+	bsp->shaders = malloc( maxShaders * sizeof( *bsp->shaders ) );
 	for (i = 0; i < numTexInfo; i++)
 	{
 		mtexinfo_t *texinfo = &texInfo[i];
-		dshader_t *out = &bsp->shaders[i];
+
+		dshader_t *out = &bsp->shaders[numShaders];
+		texinfo->shaderNum = numShaders;
+		numShaders++;
 
 #if 0
 		// print out flags
@@ -2962,7 +3053,9 @@ bspFile_t *BSP_LoadDK( const bspFormat_t *format, const char *name, const void *
 					out->contentFlags = JKA_CONTENTS_TRANSLUCENT;
 				}
 
-				Q_strncpyz(out->shader, "textures/common/nodraw", sizeof( out->shader ) );
+				//Q_strncpyz(out->shader, "textures/common/nodraw", sizeof( out->shader ) );
+				Q_strncpyz(out->shader, texinfo->image->name, sizeof( out->shader ) );
+
 			} else {
 				if ( !outputJKA ) {
 					out->surfaceFlags = Q3_SURF_NOLIGHTMAP | Q3_SURF_NOMARKS | Q3_SURF_NONSOLID | Q3_SURF_NOIMPACT;
@@ -2972,7 +3065,8 @@ bspFile_t *BSP_LoadDK( const bspFormat_t *format, const char *name, const void *
 					out->contentFlags = JKA_CONTENTS_PLAYERCLIP;
 				}
 
-				Q_strncpyz(out->shader, "textures/common/clip", sizeof( out->shader ) );
+				//Q_strncpyz(out->shader, "textures/common/clip", sizeof( out->shader ) );
+				Q_strncpyz(out->shader, texinfo->image->name, sizeof( out->shader ) );
 			}
 		}
 		else if (StringEndsWith(texinfo->image->name, "trigger.tga"))
@@ -3030,9 +3124,22 @@ bspFile_t *BSP_LoadDK( const bspFormat_t *format, const char *name, const void *
 				}
 			}
 
-			Q_strncpyz(out->shader, texinfo->image->name, sizeof( out->shader ) );
+			char customName[MAX_QPATH];
+			/*if ( VIEWFOGS && (texinfo->flags & SURF_FOGPLANE) ) {
+				sprintf(customName, "texinfo_%d", i);
+				Q_strncpyz(out->shader, customName, sizeof( out->shader ) );
+			}
+			else*/
+			{
+				Q_strncpyz(out->shader, texinfo->image->name, sizeof( out->shader ) );
+			}
 		}
 	}
+	Q_strncpyz( bsp->shaders[numShaders].shader, "textures/system/outside", sizeof( bsp->shaders[numShaders].shader ) );
+	bsp->shaders[numShaders].contentFlags |= JKA_CONTENTS_OUTSIDE;
+	bsp->shaders[numShaders].surfaceFlags = 0;
+	numShaders++;
+	bsp->numShaders = numShaders;
 
 	// brushsides
 	bsp->numBrushSides = numBrushSides;
@@ -3053,13 +3160,13 @@ bspFile_t *BSP_LoadDK( const bspFormat_t *format, const char *name, const void *
 			//}
 			out->planeNum = LittleShort (in->planenum);
 			j = LittleShort (in->texinfo);
-			out->shaderNum = j;
-			if (out->shaderNum < 0) {
-				out->shaderNum = 0; // HACK
+			if (j < 0) {
+				j = 0; // HACK
 				//Com_Error(ERR_DROP, "oops");
 			}
 			if (j >= numTexInfo)
 				Com_Error (ERR_DROP, "Bad brushside texinfo");
+			out->shaderNum = texInfo[j].shaderNum;
 			out->surfaceNum = j;
 		}
 	}
@@ -3179,25 +3286,37 @@ bspFile_t *BSP_LoadDK( const bspFormat_t *format, const char *name, const void *
 				}
 
 				// volumeNum = R_FogVolumeForBrush( in->brushnum );
-				for (j=0 ; j<out->nummarksurfaces ; j++)
+				if (VIEWFOGS)
 				{
-					msurface_t *surf = &faces[bsp->leafSurfaces[out->firstmarksurface + j]];
-
-					// looks like we need to clip each face
-					// against the brush: what's inside the brush is marked
-					// with the fog num.
-					// we can leave the non-fogged surface as-is. but the fogged
-					// surface can be appended into the surfaces list.
-					// we'd still need to fix things up...
-
-					//surf->flags |= SURF_DRAWFOG;
-					//surf->brushnum = volumeNum;
-					//r_fogvolumes[volumeNum].hull.Add( ( void * ) surf );
-					surf->fogNum = k;
-					if ( setShader && surf->texinfo->flags & SURF_FOGPLANE )
+					/*for (j=0 ; j<out->nummarksurfaces ; j++)
 					{
-						fogs[k].texinfo = surf->texinfo;
-						setShader = 0;
+						msurface_t *surf = &faces[bsp->leafSurfaces[out->firstmarksurface + j]];
+
+						surf->texinfo->flags |= SURF_FOGPLANE;
+					}*/
+				}
+				else
+				{
+					for (j=0 ; j<out->nummarksurfaces ; j++)
+					{
+						msurface_t *surf = &faces[bsp->leafSurfaces[out->firstmarksurface + j]];
+
+						// looks like we need to clip each face
+						// against the brush: what's inside the brush is marked
+						// with the fog num.
+						// we can leave the non-fogged surface as-is. but the fogged
+						// surface can be appended into the surfaces list.
+						// we'd still need to fix things up...
+
+						//surf->flags |= SURF_DRAWFOG;
+						//surf->brushnum = volumeNum;
+						//r_fogvolumes[volumeNum].hull.Add( ( void * ) surf );
+						surf->fogNum = k;
+						if ( setShader && surf->texinfo->flags & SURF_FOGPLANE )
+						{
+							fogs[k].texinfo = surf->texinfo;
+							setShader = 0;
+						}
 					}
 				}
 			}
@@ -3340,23 +3459,31 @@ bspFile_t *BSP_LoadDK( const bspFormat_t *format, const char *name, const void *
 		}
 	}
 
-	bsp->numFogs = numFogs;
-	bsp->fogs = malloc( numFogs * sizeof( *bsp->fogs ) );
+	if (VIEWFOGS)
 	{
-		mfog_t	*in;
-		dfog_t	*out;
-
-		in = fogs;
-		out = bsp->fogs;
-		for ( i = 0; i < numFogs; i++, in++, out++ )
+		bsp->numFogs = 0;
+		bsp->fogs = NULL;
+	}
+	else
+	{
+		bsp->numFogs = numFogs;
+		bsp->fogs = malloc( numFogs * sizeof( *bsp->fogs ) );
 		{
-			out->brushNum = in->brushNum;
-			Q_strncpyz( out->shader, in->shader, sizeof( out->shader ) );
-			out->visibleSide = in->visibleSide;
+			mfog_t	*in;
+			dfog_t	*out;
+
+			in = fogs;
+			out = bsp->fogs;
+			for ( i = 0; i < numFogs; i++, in++, out++ )
+			{
+				out->brushNum = in->brushNum;
+				Q_strncpyz( out->shader, in->shader, sizeof( out->shader ) );
+				out->visibleSide = in->visibleSide;
+			}
 		}
 	}
 
-	OutputTexInfoShaders( mapname, faces, numFaces, &skybox, fogs, numFogs, bsp );
+	OutputTexInfoShaders( mapname, faces, numFaces, texInfo, numTexInfo, &skybox, fogs, numFogs, bsp );
 
 	SkyBoxFree( &skybox );
 	free(edges);
