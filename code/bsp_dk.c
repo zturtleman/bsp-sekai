@@ -1999,7 +1999,7 @@ int DK_SurfaceFlagsToQuake3( int flags )
 		result |= Q3_SURF_SKY;
 	if (flags & SURF_WARP)
 		result |= Q3_SURF_NONSOLID | Q3_SURF_NOMARKS | Q3_SURF_NOLIGHTMAP;
-	
+
 	if (flags & SURF_NODRAW)
 		result |= Q3_SURF_NODRAW;
 	if (flags & SURF_HINT)
@@ -2171,6 +2171,45 @@ static void OutputTexInfoShaders( const char *basename, msurface_t *faces, int n
 	OutputGeneratedFogShaders( basename, fogs, numFogs, &stringbuf );
 
 	SkyBoxPrint( basename, skybox, &stringbuf );
+
+	// TODO: collect all e.g. fullbright texinfos (same surface flags + texture)
+	// - assign to each group a distinct shaderNum
+	// - if FULLBRIGHT: there should be a glow texture present, so use it
+	// - 
+/*
+	for ( i = 0, tex = texInfos; i < numTexInfos; i++, tex++ ) {
+		if ( !(tex->flags & SURF_FULLBRIGHT) )
+		{
+			continue;
+		}
+
+		sprintf (line, "texinfo_%d\n", tex->shaderNum);
+		AppendToBuffer( &stringbuf, line );
+
+		AppendToBuffer( &stringbuf, "{\n" );
+
+		float	color[3];
+		float	distance;
+
+		color[0] = ( float )( tex->color[0] ) / 255.0;
+		color[1] = ( float )( tex->color[1] ) / 255.0;
+		color[2] = ( float )( tex->color[2] ) / 255.0;
+
+		distance = tex->value;
+		if( distance == 0 )
+		{
+			distance = 128;
+		}
+
+		sprintf( line, "surfaceparm trans\nsurfaceparm nonsolid\nsurfaceparm nolightmap\n" );
+		AppendToBuffer( &stringbuf, line );
+
+		sprintf(line, "viewfogvars ( %f %f %f ) %f\n",
+			color[0], color[1], color[2], distance);
+		AppendToBuffer( &stringbuf, line );
+
+		AppendToBuffer( &stringbuf, "}\n" );
+	}*/
 
 	if (VIEWFOGS)
 	{
@@ -2567,6 +2606,11 @@ static void ProcessTexInfo( bspFile_t *bsp, const void *data, dheader_t *header,
 		{
 			out->skip = qtrue;
 		}
+		else if (out->flags & SURF_FOGPLANE)
+		{
+			// even if it has a texture, it is not meant to be drawn
+			out->skip = qtrue;
+		}
 	}
 
 	// count animation frames
@@ -2814,6 +2858,40 @@ static void ConvertSurfaces( bspFile_t *bsp, msurface_t *faces, int numFaces, mt
 	bsp->numSurfaces = numSurfaces;
 }
 
+static void PrintTexInfoSurfaceFlags(mtexinfo_t *texinfo)
+{
+		Com_Printf("%s ", texinfo->image->name );
+#define PRINTFLAG(f) do { if (texinfo->flags & (f)) Com_Printf( "%s ", #f ); } while (0)
+		PRINTFLAG(SURF_LIGHT);
+		PRINTFLAG(SURF_FULLBRIGHT);
+		PRINTFLAG(SURF_SKY);
+		PRINTFLAG(SURF_WARP);
+		PRINTFLAG(SURF_TRANS33);
+		PRINTFLAG(SURF_TRANS66);
+		PRINTFLAG(SURF_FLOWING);
+		PRINTFLAG(SURF_NODRAW);
+		PRINTFLAG(SURF_HINT);
+		PRINTFLAG(SURF_SKIP);
+		PRINTFLAG(SURF_WOOD);
+		PRINTFLAG(SURF_METAL);
+		PRINTFLAG(SURF_STONE);
+		PRINTFLAG(SURF_GLASS);
+		PRINTFLAG(SURF_ICE);
+		PRINTFLAG(SURF_SNOW);
+		PRINTFLAG(SURF_MIRROR);
+		PRINTFLAG(SURF_TRANSTHING);
+		PRINTFLAG(SURF_ALPHACHAN);
+		PRINTFLAG(SURF_MIDTEXTURE);
+		PRINTFLAG(SURF_PUDDLE);
+		PRINTFLAG(SURF_SURGE);
+		PRINTFLAG(SURF_BIGSURGE);
+		PRINTFLAG(SURF_BULLETLIGHT);
+		PRINTFLAG(SURF_FOGPLANE);
+		PRINTFLAG(SURF_SAND);
+		Com_Printf("\n");
+#undef PRINTFLAG
+}
+
 static qboolean outputJKA = qfalse; // TODO: make it truly switchable
 
 bspFile_t *BSP_LoadDK( const bspFormat_t *format, const char *name, const void *data, int length ) {
@@ -2990,43 +3068,18 @@ bspFile_t *BSP_LoadDK( const bspFormat_t *format, const char *name, const void *
 	{
 		mtexinfo_t *texinfo = &texInfo[i];
 
+		// TODO:
+		// group texinfos by flags + texture name
+		// assign to each such group a shader
+		// 
+
 		dshader_t *out = &bsp->shaders[numShaders];
 		texinfo->shaderNum = numShaders;
 		numShaders++;
 
-#if 0
 		// print out flags
-		Com_Printf("%s ", texinfo->image->name );
-#define PRINTFLAG(f) do { if (texinfo->flags & (f)) Com_Printf( "%s ", #f ); } while (0)
-		PRINTFLAG(SURF_LIGHT);
-		PRINTFLAG(SURF_FULLBRIGHT);
-		PRINTFLAG(SURF_SKY);
-		PRINTFLAG(SURF_WARP);
-		PRINTFLAG(SURF_TRANS33);
-		PRINTFLAG(SURF_TRANS66);
-		PRINTFLAG(SURF_FLOWING);
-		PRINTFLAG(SURF_NODRAW);
-		PRINTFLAG(SURF_HINT);
-		PRINTFLAG(SURF_SKIP);
-		PRINTFLAG(SURF_WOOD);
-		PRINTFLAG(SURF_METAL);
-		PRINTFLAG(SURF_STONE);
-		PRINTFLAG(SURF_GLASS);
-		PRINTFLAG(SURF_ICE);
-		PRINTFLAG(SURF_SNOW);
-		PRINTFLAG(SURF_MIRROR);
-		PRINTFLAG(SURF_TRANSTHING);
-		PRINTFLAG(SURF_ALPHACHAN);
-		PRINTFLAG(SURF_MIDTEXTURE);
-		PRINTFLAG(SURF_PUDDLE);
-		PRINTFLAG(SURF_SURGE);
-		PRINTFLAG(SURF_BIGSURGE);
-		PRINTFLAG(SURF_BULLETLIGHT);
-		PRINTFLAG(SURF_FOGPLANE);
-		PRINTFLAG(SURF_SAND);
-		Com_Printf("\n");
-#undef PRINTFLAG
-#endif
+		//PrintTexInfoSurfaceFlags(texinfo);
+
 		// special names
 		if (texinfo->flags & SURF_SKY)
 		{
@@ -3041,33 +3094,31 @@ bspFile_t *BSP_LoadDK( const bspFormat_t *format, const char *name, const void *
 
 			sprintf( out->shader, "textures/%s/sky", mapname );
 		}
+		else if (texinfo->flags & SURF_FOGPLANE)
+		{
+			if ( !outputJKA ) {
+				out->surfaceFlags = Q3_SURF_NODRAW | Q3_SURF_NONSOLID | Q3_SURF_NOIMPACT;
+				out->contentFlags = Q3_CONTENTS_STRUCTURAL | Q3_CONTENTS_TRANSLUCENT;
+			} else {
+				out->surfaceFlags = JKA_SURF_NODRAW | JKA_SURF_NOIMPACT;
+				out->contentFlags = JKA_CONTENTS_TRANSLUCENT;
+			}
+
+			//Q_strncpyz(out->shader, "textures/common/nodraw", sizeof( out->shader ) );
+			Q_strncpyz(out->shader, texinfo->image->name, sizeof( out->shader ) );
+		}
 		else if (StringEndsWith(texinfo->image->name, "clip.tga"))
 		{
-			// on e1m1b we have fogplanes textured by clip... which COMPLETELY ignored by DK!
-			if ( texinfo->flags & SURF_FOGPLANE ) {
-				if ( !outputJKA ) {
-					out->surfaceFlags = Q3_SURF_NODRAW | Q3_SURF_NONSOLID | Q3_SURF_NOIMPACT;
-					out->contentFlags = Q3_CONTENTS_STRUCTURAL | Q3_CONTENTS_TRANSLUCENT;
-				} else {
-					out->surfaceFlags = JKA_SURF_NODRAW | JKA_SURF_NOIMPACT;
-					out->contentFlags = JKA_CONTENTS_TRANSLUCENT;
-				}
-
-				//Q_strncpyz(out->shader, "textures/common/nodraw", sizeof( out->shader ) );
-				Q_strncpyz(out->shader, texinfo->image->name, sizeof( out->shader ) );
-
+			if ( !outputJKA ) {
+				out->surfaceFlags = Q3_SURF_NOLIGHTMAP | Q3_SURF_NOMARKS | Q3_SURF_NONSOLID | Q3_SURF_NOIMPACT;
+				out->contentFlags = Q3_CONTENTS_PLAYERCLIP;
 			} else {
-				if ( !outputJKA ) {
-					out->surfaceFlags = Q3_SURF_NOLIGHTMAP | Q3_SURF_NOMARKS | Q3_SURF_NONSOLID | Q3_SURF_NOIMPACT;
-					out->contentFlags = Q3_CONTENTS_PLAYERCLIP;
-				} else {
-					out->surfaceFlags = JKA_SURF_NOMARKS | JKA_SURF_NOIMPACT;
-					out->contentFlags = JKA_CONTENTS_PLAYERCLIP;
-				}
-
-				//Q_strncpyz(out->shader, "textures/common/clip", sizeof( out->shader ) );
-				Q_strncpyz(out->shader, texinfo->image->name, sizeof( out->shader ) );
+				out->surfaceFlags = JKA_SURF_NOMARKS | JKA_SURF_NOIMPACT;
+				out->contentFlags = JKA_CONTENTS_PLAYERCLIP;
 			}
+
+			//Q_strncpyz(out->shader, "textures/common/clip", sizeof( out->shader ) );
+			Q_strncpyz(out->shader, texinfo->image->name, sizeof( out->shader ) );
 		}
 		else if (StringEndsWith(texinfo->image->name, "trigger.tga"))
 		{
@@ -3091,8 +3142,6 @@ bspFile_t *BSP_LoadDK( const bspFormat_t *format, const char *name, const void *
 		}
 		else
 		{
-			// Com_Printf( "%s\n", texinfo->image->name );
-
 			if ( !outputJKA ) {
 				out->surfaceFlags = DK_SurfaceFlagsToQuake3( texinfo->flags );
 			} else {
@@ -3124,12 +3173,12 @@ bspFile_t *BSP_LoadDK( const bspFormat_t *format, const char *name, const void *
 				}
 			}
 
-			char customName[MAX_QPATH];
-			/*if ( VIEWFOGS && (texinfo->flags & SURF_FOGPLANE) ) {
+			if ( VIEWFOGS && (texinfo->flags & SURF_FOGPLANE) ) {
+				char customName[MAX_QPATH];
 				sprintf(customName, "texinfo_%d", i);
 				Q_strncpyz(out->shader, customName, sizeof( out->shader ) );
 			}
-			else*/
+			else
 			{
 				Q_strncpyz(out->shader, texinfo->image->name, sizeof( out->shader ) );
 			}
