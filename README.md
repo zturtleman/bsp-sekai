@@ -1,10 +1,16 @@
 # BSP sekai
+
 BSP sekai (BSP world) is a level converter for Quake 3's BSP format and games based on it. It is based on the BSP loaders in the [Spearmint engine](https://clover.moe/spearmint).
 
-This is alpha software, there are many issues of things not properly change or removed when converting to other BSP formats.
+I do not endorse redistributing converted BSP files without authorization. I would prefer new software support the original BSP files directly like Spearmint does. This was used to convert maps for NSCO:ET as a temporary solution for testing the ported mod code. No further changes to BSP sekai are planned.
+
+## Status
+
+There are many issues of things not properly change or removed when converting to other BSP formats.
 The only supported conversion is NSCO maps (Q3 with modified surface/content bits) to Enemy Territory BSP format.
 
 ## Usage
+
 ```
 bspsekai <conversion> <input-BSP> <format> <output-BSP>
 BSP sekai - v0.2
@@ -30,10 +36,12 @@ BSP format list:
 ```
 
 ## BSP Formats
+
 Quake 3 BSP format is also used by Elite Force, Tremulous, Smokin' Guns, World of Padman, Turtle Arena, and other games.
 Soldier of Fortune 2 BSP format is also used by Jedi Knight 2: Jedi Outcast and Jedi Knight: Jedi Academy.
 
 ### Write formats
+
 Currently, only Q3 BSP format and games that changed the version number are supported.
 
 Game | BSP ident & version
@@ -44,6 +52,7 @@ Wolfenstein: Enemy Territory | IBSP 47
 Dark Salvation               | IBSP 666
 
 ### Read formats
+
 Game | BSP ident & version | notes
 ---- | ---- | ----
 Q3 IHV test                  | IBSP 43
@@ -62,9 +71,11 @@ Medal of Honor Allied Assult | 2015 19  | major differences from FAKK, not fully
 Elite Force 2                | EF2! 20  | major differences from FAKK, not fully supported
 
 ## License
+
 BSP sekai is licensed under a [modified version of the GNU GPLv3](https://github.com/zturtleman/bsp-sekai/blob/master/COPYING.txt#L625) (or at your option, any later version). The license is also used by Spearmint, Return to Castle Wolfenstein, Wolfenstein: Enemy Territory, and Doom 3.
 
 ## Compiling
+
 BSP sekai uses CMake for generating the build system.
 
 For example on GNU/Linux with git and cmake installed:
